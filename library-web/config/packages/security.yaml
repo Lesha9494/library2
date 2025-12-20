@@ -1,0 +1,54 @@
+security:
+    password_hashers:
+        App\Entity\Reader: "auto"
+
+    providers:
+        readers:
+            entity:
+                class: App\Entity\Reader
+                property: email
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        main:
+            lazy: true
+            provider: readers
+            custom_authenticator: App\Security\ReaderAuthenticator # Оставляем только это
+            entry_point: App\Security\ReaderAuthenticator # Добавляем entry_point
+
+            logout:
+                path: app_logout
+                target: app_login
+
+            remember_me:
+                secret: "%kernel.secret%"
+                lifetime: 604800
+                path: /
+
+    role_hierarchy:
+        ROLE_ADMIN: [ROLE_LIBRARIAN, ROLE_READER]
+        ROLE_LIBRARIAN: [ROLE_READER]
+
+    access_control:
+        - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/logout, roles: PUBLIC_ACCESS }
+        - { path: ^/$, roles: PUBLIC_ACCESS }
+
+        - { path: ^/admin, roles: ROLE_ADMIN }
+
+        - { path: ^/book, roles: ROLE_LIBRARIAN }
+        - { path: ^/author, roles: ROLE_LIBRARIAN }
+        - { path: ^/loan, roles: ROLE_LIBRARIAN }
+        - { path: ^/reader, roles: ROLE_LIBRARIAN }
+
+        - { path: ^/profile, roles: ROLE_READER }
+
+when@test:
+    security:
+        password_hashers:
+            App\Entity\Reader:
+                algorithm: auto
+                cost: 4

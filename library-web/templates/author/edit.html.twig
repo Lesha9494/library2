@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Редактировать автора
+{% endblock %}
+
+{% block body %}
+	<div class="container">
+		<h1>Редактировать автора</h1>
+
+		{{ include('author/_form.html.twig', {'button_label': 'Обновить'}) }}
+
+		<div style="margin-top: 20px;">
+			<a href="{{ path('app_author_index') }}" class="back-link">Назад к списку</a>
+		</div>
+	</div>
+{% endblock %}

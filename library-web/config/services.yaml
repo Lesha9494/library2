@@ -1,0 +1,7 @@
+# library-web/config/services.yaml
+services:
+    App\Service\ActionLogger:
+        arguments:
+            $em: "@doctrine.orm.entity_manager"
+            $requestStack: "@request_stack"
+            $tokenStorage: "@security.token_storage"

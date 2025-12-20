@@ -1,0 +1,216 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Выдача #{{ loan.id }}
+{% endblock %}
+
+{% block body %}
+	<div class="container">
+		<div class="loan-header">
+			<h1>Выдача книги #{{ loan.id }}</h1>
+			<div class="actions">
+				<a href="{{ path('app_loan_edit', {'id': loan.id}) }}" class="btn-edit">Изменить</a>
+				{{ include('loan/_delete_form.html.twig') }}
+			</div>
+		</div>
+
+		<div class="loan-info">
+			<div class="info-row">
+				<span class="label">Читатель:</span>
+				<span class="value">
+					<a href="{{ path('app_reader_show', {'id': loan.reader.id}) }}">
+						{{ loan.reader.fullName }}
+					</a>
+				</span>
+			</div>
+
+			<div class="info-row">
+				<span class="label">Книга:</span>
+				<span class="value">
+					{% if loan.bookCopy and loan.bookCopy.book %}
+						<a href="{{ path('app_book_show', {'id': loan.bookCopy.book.id}) }}">
+							{{ loan.bookCopy.book.title }}
+						</a>
+					{% else %}
+						Не указана
+					{% endif %}
+				</span>
+			</div>
+
+			<div class="info-row">
+				<span class="label">Дата выдачи:</span>
+				<span class="value">{{ loan.issueDate ? loan.issueDate|date('d.m.Y') : '' }}</span>
+			</div>
+
+			<div class="info-row">
+				<span class="label">Срок возврата:</span>
+				<span class="value">{{ loan.dueDate ? loan.dueDate|date('d.m.Y') : '' }}</span>
+			</div>
+
+			<div class="info-row">
+				<span class="label">Дата возврата:</span>
+				<span class="value">
+					{% if loan.returnDate %}
+						{{ loan.returnDate|date('d.m.Y') }}
+					{% else %}
+						<span style="color: #f44336;">Еще не возвращена</span>
+					{% endif %}
+				</span>
+			</div>
+
+			<div class="info-row">
+				<span class="label">Статус:</span>
+				<span class="value">
+					{% if loan.returnDate %}
+						<span class="status-returned">Книга возвращена</span>
+					{% else %}
+						{% set today = "now"|date('Y-m-d') %}
+						{% set dueDate = loan.dueDate ? loan.dueDate|date('Y-m-d') : '' %}
+						{% if dueDate < today %}
+							<span class="status-overdue">Просрочена ({{ (today|date('U') - dueDate|date('U')) / 86400 }}
+								дней)</span>
+						{% else %}
+							<span class="status-active">На руках</span>
+						{% endif %}
+					{% endif %}
+				</span>
+			</div>
+		</div>
+
+		<div style="margin-top: 30px;">
+			{% if not loan.returnDate %}
+				<form method="post" action="{{ path('app_loan_return', {'id': loan.id}) }}" style="display: inline;">
+					<input type="hidden" name="_token" value="{{ csrf_token('return' ~ loan.id) }}">
+					<button type="submit" class="btn-return">Отметить как возвращенную</button>
+				</form>
+			{% endif %}
+
+			<div style="margin-top: 15px;">
+				<a href="{{ path('app_loan_index') }}" class="back-link">← Назад к списку выдач</a>
+			</div>
+		</div>
+	</div>
+
+	<style>
+		.container {
+			max-width: 800px;
+			margin: 0 auto;
+			padding: 20px;
+		}
+
+		.loan-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 30px;
+			border-bottom: 2px solid #eee;
+			padding-bottom: 15px;
+		}
+
+		h1 {
+			color: #333;
+			margin: 0;
+		}
+
+		.actions {
+			display: flex;
+			gap: 10px;
+		}
+
+		.btn-edit {
+			background: #FF9800;
+			color: white;
+			padding: 8px 15px;
+			border-radius: 4px;
+			text-decoration: none;
+		}
+
+		.btn-edit:hover {
+			background: #F57C00;
+		}
+
+		.btn-delete {
+			background: #f44336;
+			color: white;
+			padding: 8px 15px;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+		}
+
+		.btn-delete:hover {
+			background: #d32f2f;
+		}
+
+		.loan-info {
+			background: #f9f9f9;
+			padding: 20px;
+			border-radius: 5px;
+		}
+
+		.info-row {
+			display: flex;
+			margin-bottom: 15px;
+			padding-bottom: 15px;
+			border-bottom: 1px solid #eee;
+		}
+
+		.info-row:last-child {
+			border-bottom: none;
+			margin-bottom: 0;
+		}
+
+		.label {
+			width: 150px;
+			font-weight: bold;
+			color: #555;
+		}
+
+		.value {
+			flex: 1;
+		}
+
+		.status-returned {
+			background: #4CAF50;
+			color: white;
+			padding: 5px 10px;
+			border-radius: 3px;
+		}
+
+		.status-active {
+			background: #2196F3;
+			color: white;
+			padding: 5px 10px;
+			border-radius: 3px;
+		}
+
+		.status-overdue {
+			background: #f44336;
+			color: white;
+			padding: 5px 10px;
+			border-radius: 3px;
+		}
+
+		.btn-return {
+			background: #4CAF50;
+			color: white;
+			padding: 10px 20px;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+			font-size: 16px;
+		}
+
+		.btn-return:hover {
+			background: #45a049;
+		}
+
+		.back-link {
+			color: #2196F3;
+			text-decoration: none;
+		}
+
+		.back-link:hover {
+			text-decoration: underline;
+		}
+	</style>
+{% endblock %}

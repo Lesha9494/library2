@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Редактировать выдачу
+{% endblock %}
+
+{% block body %}
+	<div class="container">
+		<h1>Редактировать выдачу книги</h1>
+
+		{{ include('loan/_form.html.twig', {'button_label': 'Обновить'}) }}
+
+		<div style="margin-top: 20px;">
+			<a href="{{ path('app_loan_index') }}" class="back-link">Назад к списку</a>
+		</div>
+	</div>
+{% endblock %}

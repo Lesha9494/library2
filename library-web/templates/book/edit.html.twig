@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Редактировать книгу
+{% endblock %}
+
+{% block body %}
+	<div class="container">
+		<h1>Редактировать книгу</h1>
+
+		{{ include('book/_form.html.twig', {'button_label': 'Обновить'}) }}
+
+		<div style="margin-top: 20px;">
+			<a href="{{ path('app_book_index') }}" class="back-link">Назад к списку</a>
+		</div>
+	</div>
+
+	<style>
+		.container {
+			max-width: 600px;
+			margin: 0 auto;
+			padding: 20px;
+		}
+
+		h1 {
+			color: #333;
+			margin-bottom: 20px;
+		}
+
+		.back-link {
+			color: #2196F3;
+			text-decoration: none;
+		}
+
+		.back-link:hover {
+			text-decoration: underline;
+		}
+	</style>
+{% endblock %}

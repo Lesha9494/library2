@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Редактировать читателя
+{% endblock %}
+
+{% block body %}
+	<div class="container">
+		<h1>Редактировать читателя</h1>
+
+		{{ include('reader/_form.html.twig', {'button_label': 'Обновить'}) }}
+
+		<div style="margin-top: 20px;">
+			<a href="{{ path('app_reader_index') }}" class="back-link">Назад к списку</a>
+		</div>
+	</div>
+{% endblock %}

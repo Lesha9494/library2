@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Добавить книгу
+{% endblock %}
+
+{% block body %}
+	<div class="container">
+		<h1>Добавить новую книгу</h1>
+
+		{{ include('book/_form.html.twig') }}
+
+		<div style="margin-top: 20px;">
+			<a href="{{ path('app_book_index') }}" class="back-link">Назад к списку</a>
+		</div>
+	</div>
+{% endblock %}

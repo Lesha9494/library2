@@ -1,0 +1,301 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Читатель:
+	{{ reader.fullName }}
+{% endblock %}
+
+{% block body %}
+	<div class="container">
+		<div class="reader-header">
+			<h1>{{ reader.fullName }}</h1>
+			<div class="actions">
+				<a href="{{ path('app_reader_edit', {'id': reader.id}) }}" class="btn-edit">Изменить</a>
+				{{ include('reader/_delete_form.html.twig') }}
+			</div>
+		</div>
+
+		<div class="reader-info">
+			<div class="info-row">
+				<span class="label">Номер читательского билета:</span>
+				<span class="value">{{ reader.ticketNumber }}</span>
+			</div>
+
+			<div class="info-row">
+				<span class="label">Контактная информация:</span>
+				<span class="value">{{ reader.contacts }}</span>
+			</div>
+
+			<div class="info-row">
+				<span class="label">Email:</span>
+				<span class="value">{{ reader.email ? reader.email : 'Не указан' }}</span>
+			</div>
+
+			{% if reader.roles %}
+				<div class="info-row">
+					<span class="label">Роли в системе:</span>
+					<span class="value">
+						{% for role in reader.roles %}
+							<span class="role-badge">{{ role }}</span>
+						{% endfor %}
+					</span>
+				</div>
+			{% endif %}
+		</div>
+
+		<div class="loans-section">
+			<h2>Выданные книги</h2>
+
+			{% set activeLoans = [] %}
+			{% set returnedLoans = [] %}
+
+			{% for loan in reader.loans %}
+				{% if loan.returnDate %}
+					{% set returnedLoans = returnedLoans|merge([loan]) %}
+				{% else %}
+					{% set activeLoans = activeLoans|merge([loan]) %}
+				{% endif %}
+			{% endfor %}
+
+			{% if activeLoans|length > 0 %}
+				<div class="active-loans">
+					<h3>На руках ({{ activeLoans|length }})</h3>
+					<div class="loans-list">
+						{% for loan in activeLoans %}
+							<div class="loan-card">
+								<h4>
+									{% if loan.bookCopy and loan.bookCopy.book %}
+										{{ loan.bookCopy.book.title }}
+									{% else %}
+										Книга не указана
+									{% endif %}
+								</h4>
+								<div class="loan-details">
+									<span>Выдана:
+										{{ loan.issueDate|date('d.m.Y') }}</span>
+									<span>Вернуть до:
+										{{ loan.dueDate|date('d.m.Y') }}</span>
+
+									{% set today = "now"|date('Y-m-d') %}
+									{% set dueDate = loan.dueDate ? loan.dueDate|date('Y-m-d') : '' %}
+									{% if dueDate < today %}
+										<span class="status-overdue">Просрочена на
+											{{ (today|date('U') - dueDate|date('U')) / 86400 }}
+											дней</span>
+									{% else %}
+										<span class="status-active">На руках</span>
+									{% endif %}
+								</div>
+								<a href="{{ path('app_loan_show', {'id': loan.id}) }}" class="btn-view">Подробнее</a>
+							</div>
+						{% endfor %}
+					</div>
+				</div>
+			{% endif %}
+
+			{% if returnedLoans|length > 0 %}
+				<div class="returned-loans">
+					<h3>Возвращенные книги ({{ returnedLoans|length }})</h3>
+					<div class="loans-list">
+						{% for loan in returnedLoans|slice(0, 5) %}
+							<div class="loan-card returned">
+								<h4>
+									{% if loan.bookCopy and loan.bookCopy.book %}
+										{{ loan.bookCopy.book.title }}
+									{% else %}
+										Книга не указана
+									{% endif %}
+								</h4>
+								<div class="loan-details">
+									<span>Выдана:
+										{{ loan.issueDate|date('d.m.Y') }}</span>
+									<span>Возвращена:
+										{{ loan.returnDate|date('d.m.Y') }}</span>
+									<span class="status-returned">Возвращена</span>
+								</div>
+								<a href="{{ path('app_loan_show', {'id': loan.id}) }}" class="btn-view">Подробнее</a>
+							</div>
+						{% endfor %}
+					</div>
+
+					{% if returnedLoans|length > 5 %}
+						<p style="text-align: center; margin-top: 10px;">
+							и еще
+							{{ returnedLoans|length - 5 }}
+							книг...
+						</p>
+					{% endif %}
+				</div>
+			{% endif %}
+
+			{% if activeLoans|length == 0 and returnedLoans|length == 0 %}
+				<p style="text-align: center; color: #666; padding: 20px;">
+					У этого читателя еще нет выданных книг
+				</p>
+			{% endif %}
+		</div>
+
+		<div style="margin-top: 30px;">
+			<a href="{{ path('app_reader_index') }}" class="back-link">← Назад к списку читателей</a>
+		</div>
+	</div>
+
+	<style>
+		.container {
+			max-width: 800px;
+			margin: 0 auto;
+			padding: 20px;
+		}
+
+		.reader-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 30px;
+			border-bottom: 2px solid #eee;
+			padding-bottom: 15px;
+		}
+
+		h1 {
+			color: #333;
+			margin: 0;
+		}
+
+		.actions {
+			display: flex;
+			gap: 10px;
+		}
+
+		.btn-edit {
+			background: #FF9800;
+			color: white;
+			padding: 8px 15px;
+			border-radius: 4px;
+			text-decoration: none;
+		}
+
+		.btn-edit:hover {
+			background: #F57C00;
+		}
+
+		.reader-info {
+			background: #f9f9f9;
+			padding: 20px;
+			border-radius: 5px;
+			margin-bottom: 30px;
+		}
+
+		.info-row {
+			display: flex;
+			margin-bottom: 15px;
+			padding-bottom: 15px;
+			border-bottom: 1px solid #eee;
+		}
+
+		.info-row:last-child {
+			border-bottom: none;
+			margin-bottom: 0;
+		}
+
+		.label {
+			width: 200px;
+			font-weight: bold;
+			color: #555;
+		}
+
+		.value {
+			flex: 1;
+		}
+
+		.role-badge {
+			background: #2196F3;
+			color: white;
+			padding: 3px 8px;
+			border-radius: 3px;
+			margin-right: 5px;
+			font-size: 12px;
+		}
+
+		.loans-section {
+			margin-top: 30px;
+		}
+
+		.loans-section h2 {
+			margin-bottom: 15px;
+			color: #333;
+		}
+
+		.loans-section h3 {
+			margin: 20px 0 10px;
+			color: #555;
+		}
+
+		.loans-list {
+			display: grid;
+			gap: 15px;
+		}
+
+		.loan-card {
+			background: white;
+			padding: 15px;
+			border: 1px solid #ddd;
+			border-radius: 5px;
+		}
+
+		.loan-card.returned {
+			background: #f9f9f9;
+			opacity: 0.8;
+		}
+
+		.loan-card h4 {
+			margin: 0 0 10px;
+			color: #2196F3;
+		}
+
+		.loan-details {
+			display: flex;
+			flex-direction: column;
+			gap: 5px;
+			margin-bottom: 10px;
+			color: #666;
+			font-size: 14px;
+		}
+
+		.status-active {
+			color: #4CAF50;
+			font-weight: bold;
+		}
+
+		.status-overdue {
+			color: #f44336;
+			font-weight: bold;
+		}
+
+		.status-returned {
+			color: #2196F3;
+			font-weight: bold;
+		}
+
+		.loan-card .btn-view {
+			display: inline-block;
+			background: #4CAF50;
+			color: white;
+			padding: 5px 10px;
+			border-radius: 3px;
+			text-decoration: none;
+			font-size: 14px;
+		}
+
+		.loan-card .btn-view:hover {
+			background: #45a049;
+		}
+
+		.back-link {
+			color: #2196F3;
+			text-decoration: none;
+		}
+
+		.back-link:hover {
+			text-decoration: underline;
+		}
+	</style>
+{% endblock %}

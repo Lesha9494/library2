@@ -1,0 +1,78 @@
+{{ form_start(form) }}
+<div class="form-group">
+	<label>ФИО автора:</label>
+	{{ form_widget(form.fullName, {'attr': {'class': 'form-input'}}) }}
+</div>
+
+<div class="form-group">
+	<label>Страна:</label>
+	{{ form_widget(form.country, {'attr': {'class': 'form-input'}}) }}
+</div>
+
+<div class="form-group">
+	<label>Биография:</label>
+	{{ form_widget(form.biography, {'attr': {'class': 'form-input', 'rows': 5}}) }}
+</div>
+
+<div class="form-buttons">
+	<button type="submit" class="btn-save">{{ button_label|default('Сохранить') }}</button>
+	<a href="{{ path('app_author_index') }}" class="btn-cancel">Отмена</a>
+</div>
+{{ form_end(form) }}
+
+<style>
+	.form-group {
+		margin-bottom: 15px;
+	}
+
+	.form-group label {
+		display: block;
+		margin-bottom: 5px;
+		font-weight: bold;
+	}
+
+	.form-input {
+		width: 100%;
+		padding: 8px;
+		border: 1px solid #ccc;
+		border-radius: 4px;
+		box-sizing: border-box;
+		font-family: Arial, sans-serif;
+	}
+
+	textarea.form-input {
+		min-height: 100px;
+		resize: vertical;
+	}
+
+	.form-buttons {
+		margin-top: 20px;
+		display: flex;
+		gap: 10px;
+	}
+
+	.btn-save {
+		background: #4CAF50;
+		color: white;
+		padding: 10px 20px;
+		border: none;
+		border-radius: 4px;
+		cursor: pointer;
+	}
+
+	.btn-save:hover {
+		background: #45a049;
+	}
+
+	.btn-cancel {
+		background: #f44336;
+		color: white;
+		padding: 10px 20px;
+		border-radius: 4px;
+		text-decoration: none;
+	}
+
+	.btn-cancel:hover {
+		background: #d32f2f;
+	}
+</style>

@@ -1,0 +1,176 @@
+<?php
+
+namespace App\Entity;
+
+use App\Repository\BookRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Entity(repositoryClass: BookRepository::class)]
+class Book
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private ?int $id = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $title = null;
+
+    #[ORM\ManyToOne(inversedBy: 'books')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Author $author = null;
+
+    #[ORM\Column(length: 13)]
+    private ?string $isbn = null;
+
+    #[ORM\Column]
+    private ?int $year = null;
+
+    #[ORM\Column]
+    private ?int $copies = null;
+
+    /**
+     * @var Collection<int, BookCopy>
+     */
+    #[ORM\OneToMany(targetEntity: BookCopy::class, mappedBy: 'book')]
+    private Collection $bookCopies;
+
+    /**
+     * @var Collection<int, ActionLog>
+     */
+    #[ORM\OneToMany(targetEntity: ActionLog::class, mappedBy: 'book')]
+    private Collection $actionLogs;
+
+    public function __construct()
+    {
+        $this->bookCopies = new ArrayCollection();
+        $this->actionLogs = new ArrayCollection();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(string $title): static
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function getAuthor(): ?Author
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(?Author $author): static
+    {
+        $this->author = $author;
+
+        return $this;
+    }
+
+    public function getIsbn(): ?string
+    {
+        return $this->isbn;
+    }
+
+    public function setIsbn(string $isbn): static
+    {
+        $this->isbn = $isbn;
+
+        return $this;
+    }
+
+    public function getYear(): ?int
+    {
+        return $this->year;
+    }
+
+    public function setYear(int $year): static
+    {
+        $this->year = $year;
+
+        return $this;
+    }
+
+    public function getCopies(): ?int
+    {
+        return $this->copies;
+    }
+
+    public function setCopies(int $copies): static
+    {
+        $this->copies = $copies;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BookCopy>
+     */
+    public function getBookCopies(): Collection
+    {
+        return $this->bookCopies;
+    }
+
+    public function addBookCopy(BookCopy $bookCopy): static
+    {
+        if (!$this->bookCopies->contains($bookCopy)) {
+            $this->bookCopies->add($bookCopy);
+            $bookCopy->setBook($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBookCopy(BookCopy $bookCopy): static
+    {
+        if ($this->bookCopies->removeElement($bookCopy)) {
+            // set the owning side to null (unless already changed)
+            if ($bookCopy->getBook() === $this) {
+                $bookCopy->setBook(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ActionLog>
+     */
+    public function getActionLogs(): Collection
+    {
+        return $this->actionLogs;
+    }
+
+    public function addActionLog(ActionLog $actionLog): static
+    {
+        if (!$this->actionLogs->contains($actionLog)) {
+            $this->actionLogs->add($actionLog);
+            $actionLog->setBook($this);
+        }
+
+        return $this;
+    }
+
+    public function removeActionLog(ActionLog $actionLog): static
+    {
+        if ($this->actionLogs->removeElement($actionLog)) {
+            // set the owning side to null (unless already changed)
+            if ($actionLog->getBook() === $this) {
+                $actionLog->setBook(null);
+            }
+        }
+
+        return $this;
+    }
+}
